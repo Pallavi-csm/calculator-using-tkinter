@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Phone Calculator</title>
+  <style>
+    body {
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    .calculator {
+      width: 300px;
+      background-color: #222;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      padding: 20px;
+      color: white;
+    }
+
+    .display {
+      background-color: #000;
+      color: #0f0;
+      font-size: 32px;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: right;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      padding: 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #333;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #444;
+    }
+
+    .operator {
+      background-color: orange;-----------+
+    }
+
+    .operator:hover {
+      background-color: darkorange;
+    }
+
+    .equal {
+      grid-column: span 2;
+      background-color: green;
+    }
+
+    .equal:hover {
+      background-color: darkgreen;
+    }
+
+    .clear {
+      background-color: red;
+    }
+
+    .clear:hover {
+      background-color: darkred;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div class="display">0</div>
+    <div class="buttons">
+      <button class="clear">C</button>
+      <button>±</button>
+      <button>%</button>
+      <button class="operator">÷</button>
+
+      <button>7</button>
+      <button>8</button>
+      <button>9</button>
+      <button class="operator">×</button>
+
+      <button>4</button>
+      <button>5</button>
+      <button>6</button>
+      <button class="operator">−</button>
+
+      <button>1</button>
+      <button>2</button>
+      <button>3</button>
+      <button class="operator">+</button>
+
+      <button>0</button>
+      <button>.</button>
+      <button class="equal">=</button>
+    </div>
+  </div>
+
+  <script>
+    const display = document.querySelector('.display');
+    const buttons = document.querySelectorAll('button');
+
+    let currentInput = '0';
+    let operator = null;
+    let firstOperand = null;
+
+    function updateDisplay() {
+      display.textContent = currentInput;
+    }
+
+    function handleNumber(num) {
+      if (currentInput === '0' || currentInput === 'Error') {
+        currentInput = num;
+      } else {
+        currentInput += num;
+      }
+    }
+
+    function handleOperator(op) {
+      if (firstOperand === null) {
+        firstOperand = parseFloat(currentInput);
+      } else if (operator) {
+        const result = calculate(firstOperand, parseFloat(currentInput), operator);
+        currentInput = result.toString();
+        firstOperand = result;
+      }
+      operator = op;
+      currentInput = '0';
+    }
+
+    function calculate(a, b, op) {
+      switch (op) {
+        case '+': return a + b;
+        case '−': return a - b;
+        case '×': return a * b;
+        case '÷': return b !== 0 ? a / b : 'Error';
+        default: return b;
+      }
+    }
+
+    function handleEqual() {
+      if (operator && firstOperand !== null) {
+        const result = calculate(firstOperand, parseFloat(currentInput), operator);
+        currentInput = result.toString();
+        operator = null;
+        firstOperand = null;
+      }
+    }
+
+    function handleClear() {
+      currentInput = '0';
+      operator = null;
+      firstOperand = null;
+    }
+
+    function handlePlusMinus() {
+      if (currentInput !== '0') {
+        currentInput = (parseFloat(currentInput) * -1).toString();
+      }
+    }
+
+    function handlePercent() {
+      currentInput = (parseFloat(currentInput) / 100).toString();
+    }
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const value = button.textContent;
+
+        if (!isNaN(value)) {
+          handleNumber(value);
+        } else if (value === 'C') {
+          handleClear();
+        } else if (value === '=') {
+          handleEqual();
+        } else if (value === '.') {
+          if (!currentInput.includes('.')) {
+            currentInput += '.';
+          }
+        } else if (value === '±') {
+          handlePlusMinus();
+        } else if (value === '%') {
+          handlePercent();
+        } else {
+          handleOperator(value);
+        }
+
+        updateDisplay();
+      });
+    });
+
+    updateDisplay();
+  </script>
+</body>
+</html>
